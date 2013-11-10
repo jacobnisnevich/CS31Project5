@@ -10,6 +10,7 @@ using namespace std;
 const int MAXWORDS = 10000;
 const int MINWORDLENGTH = 4;
 const int MAXWORDLENGTH = 6;
+const int MAXTRIALLENGtH = 100;
 
 int randInt(int lowest, int highest)
 {
@@ -98,7 +99,7 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 
 	bool onList = false;
 	bool isLegal = true;
-	char testWord[MAXWORDLENGTH+1] = "";
+	char testWord[MAXTRIALLENGtH+1] = "";
 	char hiddenWord[MAXWORDLENGTH+1] = "";
 
 	strcpy(hiddenWord, words[wordnum]);
@@ -106,7 +107,7 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 	do
 	{
 		cout << "Trial word: ";
-		cin.getline(testWord, MAXWORDLENGTH+1);
+		cin.getline(testWord, MAXTRIALLENGtH+1);
 			
 		cin.clear();
 		cin.sync();
@@ -123,17 +124,29 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 			}
 		}
 
+		for (int k = 0; testWord[k] != '\0'; k++)
+		{
+			if (isalpha(testWord[k]))
+			{
+				if (isupper(testWord[k]))
+					isLegal = false;
+			}
+			else
+				isLegal = false;
+
+		}
+
 		if (onList && isLegal && strcmp(testWord, hiddenWord) != 0)
 		{
 			cout << compareStrings(testWord, hiddenWord) << endl;
 		}
-		else if (!onList)
-		{
-			cout << "I don't know that word" << endl;
-		}
 		else if (!isLegal)
 		{
 			cout << "Your trial word must be a word of 4 to 6 lower case letters" << endl;
+		}
+		else if (!onList)
+		{
+			cout << "I don't know that word" << endl;
 		}
 
 		numTries++;
@@ -183,7 +196,15 @@ int main()
 		int numTries = manageOneRound(wordList, numWords, randNum);
 		
 		numTries = numTries - 1;
-		cout << "You got it in " << numTries << " tries" << endl;
+
+		if (numTries != 1)
+		{
+			cout << "You got it in " << numTries << " tries" << endl;
+		}
+		else
+		{
+			cout << "You got it in 1 try" << endl;
+		}
 
 		totalTries = totalTries + numTries;
 		averageTries = static_cast<float>(totalTries)/static_cast<float>(numRound);
