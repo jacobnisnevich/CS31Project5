@@ -94,45 +94,53 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 	if (wordnum < 0 || wordnum >= num)
 		return -1;
 
+	int numTries = 1;
+
 	bool onList = false;
 	bool isLegal = true;
 	char testWord[MAXWORDLENGTH+1] = "";
-	char hiddenWord[] = words[wordnum];
-	cout << "Trial word: ";
-	cin.getline(testWord, MAXWORDLENGTH+1);
+	char hiddenWord[MAXWORDLENGTH+1] = "";
+
+	strcpy(hiddenWord, words[wordnum]);
+
+	do
+	{
+		cout << "Trial word: ";
+		cin.getline(testWord, MAXWORDLENGTH+1);
 			
-	cin.clear();
-	cin.sync();
+		cin.clear();
+		cin.sync();
+	
+		onList = false;
+		isLegal = true;
 
-	for (int i = 0; i < num; i++)
-	{
-		if (strcmp(testWord, words[i]) == 0)
+		for (int i = 0; i < num; i++)
 		{
-			onList = true;
-			break;
+			if (strcmp(testWord, words[i]) == 0)
+			{
+				onList = true;
+				break;
+			}
 		}
-	}
-	for (int i = 0; testWord[i] != '\0'; i++)
-	{
-				
-	}
 
-	int score = compareStrings(testWord, hiddenWord);
+		if (onList && isLegal && strcmp(testWord, hiddenWord) != 0)
+		{
+			cout << compareStrings(testWord, hiddenWord) << endl;
+		}
+		else if (!onList)
+		{
+			cout << "I don't know that word" << endl;
+		}
+		else if (!isLegal)
+		{
+			cout << "Your trial word must be a word of 4 to 6 lower case letters" << endl;
+		}
 
-	if (onList && isLegal && strcmp(testWord, hiddenWord) != 0)
-	{
-		cout << score << endl;
-	}
-	else if (!onList)
-	{
-		cout << "I don't know that word" << endl;
-	}
-	else if (!isLegal)
-	{
-		cout << "Your trial word must be a word of 4 to 6 lower case letters" << endl;
-	}
+		numTries++;
 
-	return score;
+	} while (strcmp(testWord, hiddenWord) != 0);
+
+	return numTries;
 }
 
 int main()
@@ -142,8 +150,7 @@ int main()
 	int randomLength = 0;
 	int numWords = 0;
 
-	int numTries = 1;
-	int averageTries = 0;
+	float averageTries = 0.0;
 	int totalTries = 0;
 	int maxTries = 0;
 	int minTries = INT_MAX;
@@ -173,23 +180,27 @@ int main()
 		cout << endl << "Round " << numRound << endl;
 		cout << "The hidden word is " << randomLength <<" letters long" << endl;
 
-		do
-		{
-			manageOneRound(wordList, numWords, randNum);
-			numTries++;
-		} while (strcmp(testWord, randomWord) != 0);
-
+		int numTries = manageOneRound(wordList, numWords, randNum);
+		
 		numTries = numTries - 1;
 		cout << "You got it in " << numTries << " tries" << endl;
 
 		totalTries = totalTries + numTries;
-		averageTries = totalTries/numRound;
+		averageTries = static_cast<float>(totalTries)/static_cast<float>(numRound);
 		if (numTries <= minTries)
 			minTries = numTries;
 		if (numTries >= maxTries)
 			maxTries = numTries;
 
-		cout <<	"Average: " << averageTries << ", minimum: " << minTries << ", maximum: " << maxTries << endl;
+		cout <<	"Average: ";
+
+		cout.setf(ios::fixed);
+		cout.setf(ios::showpoint);
+		cout.precision(2);
+
+		cout << averageTries;
+
+		cout << ", minimum: " << minTries << ", maximum: " << maxTries << endl;
 		
 		numRound++;
 	} while (numRound <= maxRounds);
