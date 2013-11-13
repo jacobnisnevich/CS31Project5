@@ -7,11 +7,18 @@
 #include <cctype>
 using namespace std;
 
-const int MAXWORDS = 10000;
-const int MINWORDLENGTH = 4;
-const int MAXWORDLENGTH = 6;
-const int MAXTRIALLENGtH = 100;
+// global constants declared and intialized
 
+// maximum number of words in the list of words
+const int MAXWORDS = 10000;
+// minimum length of individual word in list
+const int MINWORDLENGTH = 4;
+// maximum length of individual word in list
+const int MAXWORDLENGTH = 6;
+// maximum length of trial word
+const int MAXTRIALLENGTH = 100;
+
+// function that finds picks a random integer between the lower and upper bounds specified
 int randInt(int lowest, int highest)
 {
 	if (highest < lowest)
@@ -19,8 +26,10 @@ int randInt(int lowest, int highest)
 	return lowest + (std::rand() % (highest - lowest + 1));
 }
 
+// file path of text file containing list of words
 const char filename[] = "C:\\Users\\Jacob\\Downloads\\words.txt";
 
+// function that loads words from a text file into an array of words
 int loadWords(char words[][MAXWORDLENGTH+1], int maxWords)
 {
     ifstream wordfile(filename);
@@ -58,30 +67,41 @@ int loadWords(char words[][MAXWORDLENGTH+1], int maxWords)
     return numWords;
 }
 
+// function that finds a random word from a list of words
 int getRandomWord(char wordList[MAXWORDS][MAXWORDLENGTH+1], int numWords, char randomWord[])
 {
+	// gets a random number from 0 to the total number of words in the array
 	int randNum = 0;
 	randNum = randInt(0, numWords);
+
+	// copies a word from the list of words at the given number to a new c-string
 	strcpy(randomWord, wordList[randNum]);
+
+	// returns the random number
 	return randNum;
 }
 
+// function that compares two strings and returns the number of lowercase letters in common
 int compareStrings(char trialWord[], char hiddenWord[])
 {
+	// creates array of bools to ensure that no repeats are tested
 	bool pos[MAXWORDLENGTH];
 	for (int i = 0; i < MAXWORDLENGTH; i++)
 	{
 		pos[i] = false; 
 	}
 
+	// set of loops that adds one to charCounter for each character in common
 	int charCounter = 0;
 	for (int i = 0; trialWord[i] != '\0'; i++)
 	{
 		for (int k = 0; hiddenWord[k] != '\0'; k++)
 		{
+			// if statement checks to make sure that pos[k] is not true to make sure that no duplicates are used
 			if (!pos[k] && trialWord[i] == hiddenWord[k])
 			{
 				charCounter++;
+				// sets bool at the position k to true to keep track of repeats
 				pos[k] = true;
 				break;
 			}
@@ -90,16 +110,18 @@ int compareStrings(char trialWord[], char hiddenWord[])
 	return charCounter;
 }
 
+// function that goes through a single round of the game
 int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 {
-	if (wordnum < 0 || wordnum >= num)
+	// check to make sure that the number of the word is valid
+	if (wordnum < 0 || wordnum >= num || num < 0)
 		return -1;
 
 	int numTries = 1;
 
 	bool onList = false;
 	bool isLegal = true;
-	char testWord[MAXTRIALLENGtH+1] = "";
+	char testWord[MAXTRIALLENGTH+1] = "";
 	char hiddenWord[MAXWORDLENGTH+1] = "";
 
 	strcpy(hiddenWord, words[wordnum]);
@@ -107,7 +129,7 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 	do
 	{
 		cout << "Trial word: ";
-		cin.getline(testWord, MAXTRIALLENGtH+1);
+		cin.getline(testWord, MAXTRIALLENGTH+1);
 			
 		cin.clear();
 		cin.sync();
@@ -132,6 +154,8 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 					isLegal = false;
 			}
 			else
+				isLegal = false;
+			if (strlen(testWord) < 4 || strlen(testWord) > 6)
 				isLegal = false;
 
 		}
