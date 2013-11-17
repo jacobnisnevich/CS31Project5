@@ -72,7 +72,7 @@ int getRandomWord(char wordList[MAXWORDS][MAXWORDLENGTH+1], int numWords, char r
 {
 	// gets a random number from 0 to the total number of words in the array
 	int randNum = 0;
-	randNum = randInt(0, numWords);
+	randNum = randInt(0, numWords-1);
 
 	// copies a word from the list of words at the given number to a new c-string
 	strcpy(randomWord, wordList[randNum]);
@@ -126,6 +126,7 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 
 	strcpy(hiddenWord, words[wordnum]);
 
+	// actual round output and input
 	do
 	{
 		cout << "Trial word: ";
@@ -136,7 +137,8 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 	
 		onList = false;
 		isLegal = true;
-
+		
+		// tests if the word is on the list
 		for (int i = 0; i < num; i++)
 		{
 			if (strcmp(testWord, words[i]) == 0)
@@ -146,6 +148,7 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 			}
 		}
 
+		// tests if the word is a legal 4 to 6 character lowercase word
 		for (int k = 0; testWord[k] != '\0'; k++)
 		{
 			if (isalpha(testWord[k]))
@@ -160,14 +163,17 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 
 		}
 
+		// compares the words if not equal, legal, and on the list
 		if (onList && isLegal && strcmp(testWord, hiddenWord) != 0)
 		{
 			cout << compareStrings(testWord, hiddenWord) << endl;
 		}
+		// prints error message if not legal word
 		else if (!isLegal)
 		{
 			cout << "Your trial word must be a word of 4 to 6 lower case letters" << endl;
 		}
+		// prints error message if word is not on the list of words
 		else if (!onList)
 		{
 			cout << "I don't know that word" << endl;
@@ -182,45 +188,58 @@ int manageOneRound(const char words[][MAXWORDLENGTH+1], int num, int wordnum)
 
 int main()
 {
+	// declaration and initialization of round and word length variables
 	int maxRounds = 0;
 	int numRound = 1;
 	int randomLength = 0;
 	int numWords = 0;
 
+	// declaration and initialization of tries statistics variables
 	float averageTries = 0.0;
 	int totalTries = 0;
 	int maxTries = 0;
 	int minTries = INT_MAX;
 
+	// initial seeding for the random integer
 	std::srand((int)std::time(0));
 	
+	// creates the word list from a text file
 	char wordList[MAXWORDS][MAXWORDLENGTH+1];
 	numWords = loadWords(wordList, MAXWORDS);
 
+	// declares the random word
 	char randomWord[MAXWORDLENGTH+1] = "";
 
+	// initial number of rounds prompt
 	cout << "How many rounds do you want to play? ";
 	cin >> maxRounds;
 
 	cin.ignore(10000, '\n');
 
+	// tests to make sure number of rounds is valid
 	if (maxRounds <= 0)
 	{
 		cout << "The number of rounds must be positive" << endl;
 		return -1;
 	}
+
+	// primary program loop
 	do
 	{
+		// generates random integer and length of random word
 		int randNum = getRandomWord(wordList, numWords, randomWord);
 		randomLength = strlen(randomWord);
 
+		// initial round output
 		cout << endl << "Round " << numRound << endl;
 		cout << "The hidden word is " << randomLength <<" letters long" << endl;
 
+		// calls the manageOneRound function that runs through output and input for a single round
 		int numTries = manageOneRound(wordList, numWords, randNum);
 		
 		numTries = numTries - 1;
-
+		
+		// prints out number of tries
 		if (numTries != 1)
 		{
 			cout << "You got it in " << numTries << " tries" << endl;
@@ -230,6 +249,7 @@ int main()
 			cout << "You got it in 1 try" << endl;
 		}
 
+		// calculates average, maximum, and minimum
 		totalTries = totalTries + numTries;
 		averageTries = static_cast<float>(totalTries)/static_cast<float>(numRound);
 		if (numTries <= minTries)
@@ -237,8 +257,10 @@ int main()
 		if (numTries >= maxTries)
 			maxTries = numTries;
 
+		// ouput of statistics
 		cout <<	"Average: ";
 
+		// makes sure that average statistic is a float with two decimal points
 		cout.setf(ios::fixed);
 		cout.setf(ios::showpoint);
 		cout.precision(2);
